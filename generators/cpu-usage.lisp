@@ -10,8 +10,7 @@
   ((previous-time :initform 0 :accessor previous-time)
    (previous-idle :initform 0 :accessor previous-idle))
   (:default-initargs
-   :label "CPU"
-   :value-format "~4,1f%"))
+   :text "CPU ~4,1f%"))
 
 (defmethod compute-value ((generator cpu-usage))
   (let* ((line (with-open-file (i "/proc/stat") (read-line i)))
@@ -22,5 +21,6 @@
          (diff-idle (- current-idle (previous-idle generator))))
     (setf (previous-time generator) current-time)
     (setf (previous-idle generator) current-idle)
-    (float (/ (+ 5 (* 1000 (/ (- diff-time diff-idle) diff-time)))
-              10))))
+    (list
+     (float (/ (+ 5 (* 1000 (/ (- diff-time diff-idle) diff-time)))
+               10)))))

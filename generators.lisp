@@ -6,7 +6,12 @@
 
 (in-package #:org.shirakumo.cari3s)
 
-(defclass single-generator (block)
+(defclass generator ()
+  ())
+
+(defgeneric generate (generator event))
+
+(defclass single-generator (pango-block)
   ())
 
 (defmethod generate :around ((generator single-generator) event)
@@ -14,16 +19,14 @@
   generator)
 
 (defclass value-generator (single-generator)
-  ((label :initarg :label :accessor label)
-   (value-format :initarg :value-format :accessor value-format))
-  (:default-initargs
-   :text NIL
-   :value-format "~a"))
+  ((value :initform NIL :accessor value)))
 
 (defgeneric compute-value (value-generator))
 
+(defmethod text ((generator value-generator))
+  (markup-regions (apply #'format NIL (slot-value generator 'text)
+                         (value generator))
+                  (markup generator)))
+
 (defmethod generate ((generator value-generator) event)
-  (setf (text generator) (format NIL "~@[~a ~]~@?"
-                                 (label generator)
-                                 (value-format generator)
-                                 (compute-value generator))))
+  (setf (value generator) (compute-value generator)))

@@ -12,8 +12,7 @@
    (previous-time :initform (get-internal-real-time) :accessor previous-time)
    (previous-value :initform 0 :accessor previous-value))
   (:default-initargs
-   :label "I/O"
-   :value-format "~4,1fm/s"
+   :text "I/O ~4,1fM/s"
    :device T
    :direction :read-write))
 
@@ -38,4 +37,4 @@
                      INTERNAL-TIME-UNITS-PER-SECOND)))
       (setf (previous-value generator) value)
       (setf (previous-time generator) (get-internal-real-time))
-      (if (= 0 tdiff) 0.0 (float (/ diff tdiff))))))
+      (list (if (= 0 tdiff) 0.0 (float (/ diff tdiff)))))))

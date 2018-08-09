@@ -10,8 +10,7 @@
   ((include-swap :initarg :include-swap :accessor include-swap)
    (include-cache :initarg :include-cache :accessor include-cache))
   (:default-initargs
-   :label "MEM"
-   :value-format "~4,1f%"
+   :text "MEM ~4,1f%"
    :include-swap NIL
    :include-cache NIL))
 
@@ -29,13 +28,14 @@
   (let* ((meminfo (parse-meminfo))
          (total (+ (gethash "MemTotal" meminfo)
                    (if (include-swap generator) (gethash "SwapTotal" meminfo) 0))))
-    (* 100
-       (/ (- total
-             (gethash "MemFree" meminfo)
-             (gethash "Buffers" meminfo)
-             (if (include-cache generator) 0 (gethash "Cached" meminfo))
-             (if (include-swap generator)
-                 (+ (gethash "SwapFree" meminfo)
-                    (if (include-cache generator) 0 (gethash "SwapCached" meminfo)))
-                 0))
-          total))))
+    (list
+     (* 100
+        (/ (- total
+              (gethash "MemFree" meminfo)
+              (gethash "Buffers" meminfo)
+              (if (include-cache generator) 0 (gethash "Cached" meminfo))
+              (if (include-swap generator)
+                  (+ (gethash "SwapFree" meminfo)
+                     (if (include-cache generator) 0 (gethash "SwapCached" meminfo)))
+                  0))
+           total)))))

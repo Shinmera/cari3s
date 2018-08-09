@@ -49,7 +49,7 @@
    :urgent-p NIL
    :separator NIL))
 
-(defmethod markup ((block block)) :none)
+(defmethod text-format ((block block)) :none)
 
 (defmethod jonathan:%to-json ((block block))
   (jonathan:with-object
@@ -74,14 +74,17 @@
         (maybe-output "separator" T)
         (when (numberp (separator block))
           (jonathan:write-key-value "separator_block_width" (separator block))))
-      (unless (eql :none (markup block))
-        (jonathan:write-key-value "markup" (string-downcase (markup block)))))))
+      (unless (eql :none (text-format block))
+        (jonathan:write-key-value "markup" (string-downcase (text-format block)))))))
 
-(defclass pango-block ()
+(defclass pango-block (block)
   ((markup :initarg :markup :accessor markup)
-   (short-markup :initarg :short-markup :accessor short-markup)))
+   (short-markup :initarg :short-markup :accessor short-markup))
+  (:default-initargs
+   :markup ()
+   :short-markup ()))
 
-(defmethod markup ((block pango-block)) :pango)
+(defmethod text-format ((block pango-block)) :pango)
 
 (defmethod text ((block pango-block))
   (markup-regions (call-next-method) (markup block)))
@@ -120,8 +123,3 @@
                           :location (cons (k "x") (k "y"))
                           :relative-location (cons (k "relative_x") (k "relative_y"))
                           :block-size (cons (k "width") (k "height")))))
-
-(defclass generator ()
-  ())
-
-(defgeneric generate (generator event))

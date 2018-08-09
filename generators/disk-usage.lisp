@@ -9,8 +9,7 @@
 (defclass disk-usage (value-generator)
   ((device :initarg :device :accessor device))
   (:default-initargs
-   :label "DISK"
-   :value-format "~4,1f%"
+   :text "DISK ~4,1f%"
    :device "/"))
 
 (cffi:defctype __fsword_t #+x86-64 :uint64 #+x86 :uint32)
@@ -42,8 +41,9 @@
 
 (defmethod compute-value ((generator disk-usage))
   (cffi:with-foreign-object (buffer '(:struct file-system))
-    (cond ((= 0 (statfs (device generator) buffer))
-           (cffi:with-foreign-slots ((blocks available-blocks) buffer (:struct file-system))
-             (float (* (/ (- blocks available-blocks) blocks) 100))))
-          (T
-           "Error"))))
+    (list
+     (cond ((= 0 (statfs (device generator) buffer))
+            (cffi:with-foreign-slots ((blocks available-blocks) buffer (:struct file-system))
+              (float (* (/ (- blocks available-blocks) blocks) 100))))
+           (T
+            "Error")))))
