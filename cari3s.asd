@@ -18,6 +18,7 @@
                (:file "protocol")
                (:file "generators")
                (:file "toplevel")
+               (:file "generators/battery")
                (:file "generators/clock")
                (:file "generators/cpu-usage")
                (:file "generators/disk-usage")
