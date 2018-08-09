@@ -13,10 +13,18 @@
   :homepage "https://github.com/Shinmera/cari3s"
   :serial T
   :components ((:file "package")
+               (:file "toolkit")
                (:file "pango")
                (:file "protocol")
                (:file "generators")
                (:file "toplevel")
+               (:file "generators/clock")
+               (:file "generators/cpu-usage")
+               (:file "generators/disk-usage")
+               (:file "generators/io-usage")
+               (:file "generators/mem-usage")
+               (:file "generators/network-ip")
                (:file "documentation"))
   :depends-on (:jonathan
+               :cffi
                :documentation-utils))
