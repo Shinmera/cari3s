@@ -16,6 +16,7 @@
                (:file "toolkit")
                (:file "protocol")
                (:file "generators")
+               (:file "status-bar")
                (:file "toplevel")
                (:file "generators/battery")
                (:file "generators/clock")
