@@ -9,7 +9,7 @@
 (defclass battery (value-generator)
   ((battery-name :initarg :battery :accessor battery-name))
   (:default-initargs
-   :text "BAT ~4,1f% ~:[🡇~;🡅~] ~d:~2,'0d"
+   :text "BAT ~4,1f% ~:[🡇~;🡅~]~@[ ~d:~2,'0d~]"
    :battery T
    :markup '((0 3 :color #x0088EE))))
 
@@ -34,11 +34,12 @@
           (setf charge-now (/ (* 1000 energy-now) (or voltage-now 1000)))
           (when power-now
             (setf power-now (/ (* 1000 power-now) (or voltage-now 1000)))))
-        (let ((seconds (if charging-p
-                           (* 3600 (/ (- charge-full charge-now) power-now))
-                           (* 3600 (/ charge-now power-now)))))
+        (let ((seconds (when (and power-now (< 1 power-now))
+                         (if charging-p
+                             (* 3600 (/ (- charge-full charge-now) power-now))
+                             (* 3600 (/ charge-now power-now))))))
           (list (float (min 100 (max 0 (* 100 (/ charge-now charge-full)))))
                 charging-p
-                (floor seconds 3600)
-                (floor (mod seconds 3600) 60)
-                (mod seconds 60)))))))
+                (when seconds (floor seconds 3600))
+                (when seconds (floor (mod seconds 3600) 60))
+                (when seconds (mod seconds 60))))))))
