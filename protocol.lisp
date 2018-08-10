@@ -27,7 +27,7 @@
 (defclass block ()
   ((text :initarg :text :accessor text)
    (short-text :initarg :short-text :accessor short-text)
-   (color :initarg :color :accessor color)
+   (foreground :initarg :foreground :accessor foreground)
    (background :initarg :background :accessor background)
    (border :initarg :border :accessor border)
    (min-width :initarg :min-width :accessor min-width)
@@ -39,7 +39,7 @@
   (:default-initargs
    :text (error "TEXT required.")
    :short-text NIL
-   :color NIL
+   :foreground NIL
    :background NIL
    :border NIL
    :min-width NIL
@@ -59,7 +59,7 @@
                                  ,name ,(if transform `(,transform %temp) '%temp))))))
       (jonathan:write-key-value "full_text" (text block))
       (maybe-output "short_text" (short-text block))
-      (maybe-output "color" (color block) format-color-string)
+      (maybe-output "color" (foreground block) format-color-string)
       (maybe-output "background" (background block) format-color-string)
       (maybe-output "border" (border block) format-color-string)
       (maybe-output "min_width" (min-width block))
