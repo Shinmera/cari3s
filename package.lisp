@@ -44,9 +44,7 @@
    #:instance
    #:urgent-p
    #:separator)
-  ;; toolkit.lisp
-  (:export)
-  ;; toplevel.lisp
+  ;; status-bar.lisp
   (:export
    #:status-bar
    #:interval
@@ -57,7 +55,11 @@
    #:click-pause
    #:produce-output
    #:process
-   #:run-bar
+   #:run-bar)
+  ;; toolkit.lisp
+  (:export)
+  ;; toplevel.lisp
+  (:export
    #:load-from-file
    #:run-bar-from-file
    #:toplevel))
