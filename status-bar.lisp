@@ -63,5 +63,5 @@
                (let* ((end (get-internal-real-time))
                       (loss (/ (- end start) INTERNAL-TIME-UNITS-PER-SECOND)))
                  (setf start end)
-                 (sleep (min 0 (- pause loss))))))
+                 (sleep (max 0 (- pause loss))))))
     (write-line "]" (output bar))))
