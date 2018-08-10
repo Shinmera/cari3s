@@ -27,4 +27,9 @@
 
 (defun toplevel ()
   (let ((args (uiop:command-line-arguments)))
-    (apply #'run-bar-from-file args)))
+    (handler-case (apply #'run-bar-from-file args)
+      #+sbcl
+      (sb-sys:interactive-interrupt (e)
+        (declare (ignore e)))
+      (error (e)
+        (declare (ignore e))))))
