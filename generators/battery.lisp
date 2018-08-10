@@ -10,7 +10,8 @@
   ((battery :initarg :battery :accessor battery))
   (:default-initargs
    :text "BAT ~4,1f% ~:[🡇~;🡅~] ~d:~2,'0d"
-   :battery T))
+   :battery T
+   :markup '((0 3 :color #x0088EE))))
 
 (defmethod compute-value ((generator battery))
   (let ((battery (or (if (eql T (battery generator))

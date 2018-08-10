@@ -13,6 +13,7 @@
    (previous-value :initform 0 :accessor previous-value))
   (:default-initargs
    :text "I/O ~4,1fM/s"
+   :markup '((0 3 :color #x0088EE))
    :device T
    :direction :read-write))
 

@@ -9,7 +9,8 @@
 (defclass clock (value-generator)
   ()
   (:default-initargs
-   :text "DATE ~a"))
+   :text "DATE ~a"
+   :markup '((0 4 :color #x0088EE))))
 
 (defmethod compute-value ((generator clock))
   (multiple-value-bind (s m h dd mm yy day) (decode-universal-time (get-universal-time))

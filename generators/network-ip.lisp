@@ -10,6 +10,7 @@
   ((device :initarg :device :accessor device))
   (:default-initargs
    :text "IP ~a"
+   :markup '((0 2 :color #x0088EE))
    :device T))
 
 (cffi:defcstruct (sockaddr :conc-name sockaddr-)

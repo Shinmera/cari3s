@@ -11,6 +11,7 @@
    (include-cache :initarg :include-cache :accessor include-cache))
   (:default-initargs
    :text "MEM ~4,1f%"
+   :markup '((0 3 :color #x0088EE))
    :include-swap NIL
    :include-cache NIL))
 

@@ -10,7 +10,8 @@
   ((previous-time :initform 0 :accessor previous-time)
    (previous-idle :initform 0 :accessor previous-idle))
   (:default-initargs
-   :text "CPU ~4,1f%"))
+   :text "CPU ~4,1f%"
+   :markup '((0 3 :color #x0088EE))))
 
 (defmethod compute-value ((generator cpu-usage))
   (let* ((line (with-open-file (i "/proc/stat") (read-line i)))

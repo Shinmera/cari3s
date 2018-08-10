@@ -10,6 +10,7 @@
   ((device :initarg :device :accessor device))
   (:default-initargs
    :text "DISK ~4,1f%"
+   :markup '((0 4 :color #x0088EE))
    :device "/"))
 
 (cffi:defctype __fsword_t #+x86-64 :uint64 #+x86 :uint32)
