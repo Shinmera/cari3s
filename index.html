@@ -1,0 +1,468 @@
+<!DOCTYPE html> <html lang="en"> <head> <meta charset="utf-8"> <title>Cari3s</title> <style>html body{margin:0 auto 0 auto;padding:20px;max-width:1024px;font-family:sans-serif;font-size:14pt;overflow-y:scroll;}html body a{text-decoration:none;}html body a[href]{color:#0055AA;}html body a[href]:hover{color:#0088EE;}html body pre{background:#FAFAFA;border:1px solid #DDDDDD;padding:0.75em;overflow-x:auto;}html body pre >code a[href]{color:#223388;}article.system h1,article.system h2,article.system h3,article.system h4,article.system h5,article.system h6{margin:0.2em 0 0.1em 0;text-indent:1em;}article.system >header{text-align:center;}article.system >header img.logo{display:block;margin:auto;max-height:170px;}article.system >header h1{display:inline-block;text-indent:0;font-size:2.5em;}article.system >header .version{vertical-align:bottom;}article.system >header .languages{margin-top:-0.5em;text-transform:capitalize;}article.system >header .description{margin:0;}article.system >header .pages{margin-top:0.5em;font-size:1.2em;text-transform:capitalize;}article.system >header .pages a{display:inline-block;padding:0 0.2em;}article.system >section{margin:1em 0 1em 0;}article.system #index >ul{list-style:none;margin:0;padding:0;}article.system .row label{display:inline-block;min-width:6em;}article.system #system .row{display:flex;}article.system #system #dependencies{display:inline;margin:0;padding:0;}article.system #system #dependencies li{display:inline;padding:0 0.2em;}article.definition{margin:1em 0 0 0;}article.definition >header h1,article.definition >header h2,article.definition >header h3,article.definition >header h4,article.definition >header h5,article.definition >header h6{text-indent:0;display:inline-block;}article.definition >header ul{display:inline-block;list-style:none;margin:0;padding:0;}article.definition >header ul li{display:inline-block;padding:0 0.2em 0 0;}article.definition >header .visibility{display:none;}article.definition >header .visibility,article.definition >header .type{text-transform:lowercase;}article.definition >header .source-link{visibility:hidden;float:right;}article.definition >header .source-link:after{visibility:visible;content:"[SRC]";}article.definition .docstring{margin:0 0 0 1em;}article.definition .docstring pre{font-size:0.8em;white-space:pre-wrap;}.definition.package >header ul.nicknames{display:inline-block;list-style:none;margin:0;padding:0 0 0 1em;}.definition.package >header ul.nicknames li{display:inline;}.definition.package >header ul.nicknames:before{content:"(";}.definition.package >header ul.nicknames:after{content:")";}.definition.package ul.definitions{margin:0;list-style:none;padding:0 0 0 0.5em;}.definition.callable >header .name:before,.definition.type >header .name:before{content:"(";font-weight:normal;}.definition.callable >header .arguments:after,.definition.type >header .arguments:after{content:")";}.definition li>mark{background:none;border-left:0.3em solid #0088EE;padding-left:0.3em;display:block;}</style> </head> <body> <article class="system"> <header>  <h1>cari3s</h1> <span class="version">1.0.0</span> <nav class="languages">  <a href="index.html">English</a>  </nav> <p class="description">A generator for the i3 status bar.</p> <nav class="pages">  <a href="index.html">cari3s</a>  </nav> </header> <section id="documentation"><h2>About Cari3s</h2> <p>This is an <a href="https://i3wm.org">i3</a> status bar generator library/program.</p> <h2>How To</h2> <p>First make sure Cari3s is available to ASDF by either cloning and registering it, or downloading it via Quicklisp. Then build a standalone binary of Cari3s like this:</p> <pre><code>sbcl --dynamic-space-size 128MB --eval &quot;(asdf:make :cari3s)&quot;
+</code></pre> <p>This should produce a binary called <code>cari3s</code> in the source directory. Copy or symlink it into your <code>PATH</code>.</p> <p>Next, create a configuration file in <code>~/.config/i3/cari3s.conf</code> with something like the following:</p> <pre><code>(cpu-usage)
+(mem-usage)
+(io-usage)
+(network-ip)
+(clock)
+</code></pre> <p>Then change your <code>~/.config/i3/config</code>'s status bar section and set the <code>status_command</code> to <code>cari3s</code>:</p> <pre><code>bar {
+  status_command cari3s
+  ...
+}
+</code></pre> <p>Once you reload i3, it should display a status bar similar to the following:</p> <p><img src="https://filebox.tymoon.eu//file/TVRVNU5nPT0=" alt="status-bar"></p> <p>In the above example we defined five generators. The following generators are available out of the box:</p> <ul> <li><code><a href="#CLASS%20CARI3S%3ABATTERY" class="xref">battery</a></code></li> <li><code><a href="#CLASS%20CARI3S%3ACLOCK" class="xref">clock</a></code></li> <li><code><a href="#CLASS%20CARI3S%3ACPU-USAGE" class="xref">cpu-usage</a></code></li> <li><code><a href="#CLASS%20CARI3S%3ADISK-USAGE" class="xref">disk-usage</a></code></li> <li><code><a href="#CLASS%20CARI3S%3AIO-USAGE" class="xref">io-usage</a></code></li> <li><code><a href="#CLASS%20CARI3S%3AMEM-USAGE" class="xref">mem-usage</a></code></li> <li><code><a href="#CLASS%20CARI3S%3ANETWORK-IP" class="xref">network-ip</a></code></li> </ul> <p>The look of each of them can be customised through the <code>:text</code> format string, and the <code>:markup</code> <a href="https://shinmera.github.io/pango-markup">pango options</a>, as well as a variety of extra options for <code><a href="http://l1sp.org/cl/block" class="xref">block</a></code>s.</p> <h2>Defining new Generators</h2> <p>Defining a raw generator is just a matter of subclassing <code><a href="#CLASS%20CARI3S%3AGENERATOR" class="xref">generator</a></code> and providing a method for <code><a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATE" class="xref">generate</a></code> that, when invoked, returns a list of <code><a href="http://l1sp.org/cl/block" class="xref">block</a></code> instances that should be displayed on the status bar.</p> <p>There's some helper classes available like the <code><a href="#CLASS%20CARI3S%3ASINGLE-GENERATOR" class="xref">single-generator</a></code> and the <code><a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">value-generator</a></code>, as most generators will only produce a single block and produce their text based on some recomputed value every time. </p> <p>For the <code><a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">value-generator</a></code> all you need to implement is a method on <code><a href="#GENERIC-FUNCTION%20CARI3S%3ACOMPUTE-VALUE" class="xref">compute-value</a></code> and provide a sensible default <code>:text</code> initarg.</p> <p>None of the existing generators are terribly complicated, so if you're still unsure what to do, have a look at their sources.</p> </section>  <section id="system"> <h2>System Information</h2>  <div class="row"> <label for="version">Version:</label> <a id="version">1.0.0</a> </div>   <div class="row"> <label for="dependencies">Dependencies:</label> <ul id="dependencies"><li><a class="external">jonathan</a></li><li><a class="external">cffi</a></li><li><a class="external" href="https://github.com/Shinmera/pango-markup">pango-markup</a></li><li><a class="external" href="https://github.com/Shinmera/documentation-utils">documentation-utils</a></li></ul> </div>   <div class="row"> <label for="author">Author:</label> <a id="author" href="mailto:shinmera@tymoon.eu">Nicolas Hafner</a> </div>   <div class="row"> <label for="license">License:</label> <a id="license" href="https://tldrlegal.com/search?q=Artistic">Artistic</a> </div>   <div class="row"> <label for="homepage">Homepage:</label> <a id="homepage" href="https://github.com/Shinmera/cari3s">https://github.com/Shinmera/cari3s</a> </div>  </section>  <section id="index"> <h2>Definition Index</h2> <ul> <li> <article class="definition package" id="PACKAGE CARI3S"> <header> <h3> <a href="#PACKAGE%20CARI3S">CARI3S</a> </h3> <ul class="nicknames"> <li>ORG.SHIRAKUMO.CARI3S</li> </ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/package.lisp#L7">Source</a>  </header> <div class="docstring"><i>No documentation provided.</i></div> <ul class="definitions"> <li> <article class="definition class" id="CLASS CARI3S:BATTERY"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ABATTERY">BATTERY</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators/battery.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A generator for battery status information.
+
+You may supply the name of the battery of interest using the
+:BATTERY initarg. It defaults to the first battery device.
+
+This value-generator supplies the following five values:
+  0. charge-percentage
+  1. charging-p
+  2. hours-remaining
+  3. minutes-remaining
+  4. seconds-remaining
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:BLOCK"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ABLOCK">BLOCK</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/protocol.lisp#L27">Source</a>  </header> <div class="docstring"><pre>Class representing a block in the i3 status bar.
+
+A block is a textual container with some styling options.
+See your i3 documentation for more information on blocks and their
+behaviour.
+
+Instances of this class can be serialised using Jonathan.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ATEXT" class="xref">TEXT</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ASHORT-TEXT" class="xref">SHORT-TEXT</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AFOREGROUND" class="xref">FOREGROUND</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ABACKGROUND" class="xref">BACKGROUND</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ABORDER" class="xref">BORDER</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AMIN-WIDTH" class="xref">MIN-WIDTH</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AALIGN" class="xref">ALIGN</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ANAME" class="xref">NAME</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AINSTANCE" class="xref">INSTANCE</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AURGENT-P" class="xref">URGENT-P</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ASEPARATOR" class="xref">SEPARATOR</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ATEXT-FORMAT" class="xref">TEXT-FORMAT</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:CLICK"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ACLICK">CLICK</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/protocol.lisp#L103">Source</a>  </header> <div class="docstring"><pre>Class representing a click event being fired on a block.
+
+This event comes from i3 itself if the connection was opened with
+a header that has SEND-CLICK-EVENTS-P set to T.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ANAME" class="xref">NAME</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AINSTANCE" class="xref">INSTANCE</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ABUTTON" class="xref">BUTTON</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ALOCATION" class="xref">LOCATION</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ARELATIVE-LOCATION" class="xref">RELATIVE-LOCATION</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ABLOCK-SIZE" class="xref">BLOCK-SIZE</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:CLOCK"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ACLOCK">CLOCK</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators/clock.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A generator for a current local time clock.
+
+This value-generator supplies the following nine values:
+  0. year
+  1. month
+  2. day-of-month
+  3. day-of-week
+  4. hour
+  5. minute
+  6. second
+  7. short-day-name
+  8. short-month-name
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:CPU-USAGE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ACPU-USAGE">CPU-USAGE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators/cpu-usage.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A generator for the current CPU usage.
+
+This value-generator supplies the following value:
+  0. usage-percentage
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:DISK-USAGE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ADISK-USAGE">DISK-USAGE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators/disk-usage.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A generator for the current partition capacity usage.
+
+You may specify the path to the partition of interest using
+the :DEVICE initarg.
+
+This value-generator supplies the following value:
+  0. usage-percentage
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:EVENT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3AEVENT">EVENT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/protocol.lisp#L97">Source</a>  </header> <div class="docstring"><pre>Superclass for all events that might trigger a GENERATE.
+
+See <a href="#CLASS%20CARI3S%3ATICK" class="xref">TICK</a>
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATE" class="xref">GENERATE</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:GENERATOR"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3AGENERATOR">GENERATOR</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators.lisp#L9">Source</a>  </header> <div class="docstring"><pre>This is the superclass for all block generators.
+
+A generator is responsible for creating one or more blocks
+that are emitted into the status bar.
+
+A concrete class of a generator must supply a primary method
+on GENERATE.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATE" class="xref">GENERATE</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:HEADER"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3AHEADER">HEADER</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/protocol.lisp#L9">Source</a>  </header> <div class="docstring"><pre>Class representing the i3bar protocol header.
+
+Instances of this class can be serialised using Jonathan.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AVERSION" class="xref">VERSION</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ASTOP-SIGNAL" class="xref">STOP-SIGNAL</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ACONTINUE-SIGNAL" class="xref">CONTINUE-SIGNAL</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ASEND-CLICK-EVENTS-P" class="xref">SEND-CLICK-EVENTS-P</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:IO-USAGE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3AIO-USAGE">IO-USAGE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators/io-usage.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A generator for the current disk i/o usage.
+
+You may specify whether you're interested in :read, :write, or
+:read-write using the :DIRECTION initarg.
+
+This value-generator supplies the following value:
+  0. megabytes-per-second
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:MEM-USAGE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3AMEM-USAGE">MEM-USAGE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators/mem-usage.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A generator for the current memory usage.
+
+You may specify whether you're interested in swap and cache
+by using the :SWAP and :CACHE initargs respectively.
+
+This value-generator supplies the following three values:
+  0. usage-percentage
+  1. total-megabytes
+  2. free-megabytes
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:NETWORK-IP"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ANETWORK-IP">NETWORK-IP</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators/network-ip.lisp#L9">Source</a>  </header> <div class="docstring"><pre>A generator for the current network IP address.
+
+You may specify which device you're interested in with the
+:DEVICE initarg. It defaults to whichever device is listed
+first that does not bind to localhost.
+
+This value-generator supplies the following two values:
+  0. ip-address
+  1. device-name
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:PANGO-BLOCK"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3APANGO-BLOCK">PANGO-BLOCK</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/protocol.lisp#L80">Source</a>  </header> <div class="docstring"><pre>Represents a block whose text should be marked up with pango.
+
+Note that neither TEXT nor SHORT-TEXT should contain raw pango
+markup tags themselves, but rather you should use the MARKUP and
+SHORT-MARKUP slots to set the markup regions to be used.
+
+TEXT and SHORT-TEXT will automatically render the textual contents
+with the appropriate markup regions.
+
+Each entry in the MARKUP and SHORT-MARKUP lists should have the
+following structure:
+
+  (START END . MARKUP/MARKUP-OPTIONS)
+
+Please see the pango-markup library for more information:
+
+  https://shinmera.github.io/pango-markup
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AMARKUP" class="xref">MARKUP</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ASHORT-MARKUP" class="xref">SHORT-MARKUP</a>
+See PANGO-MARKUP:MARKUP-REGIONS</pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:SINGLE-GENERATOR"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ASINGLE-GENERATOR">SINGLE-GENERATOR</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators.lisp#L14">Source</a>  </header> <div class="docstring"><pre>Superclass for all block generators that only generate a single block.
+
+As a convenience, this generator also directly inherits from
+PANGO-BLOCK in order to let the user and subclasses customise
+the block's look and feel conveniently.
+
+The primary method of a single-generator's GENERATE does not
+need to return anything useful, as the generator itself is
+always automatically returned from GENERATE in a list.
+
+If no :name is provided on a single-generator instance, the name is
+automatically set to the class-name of the instance's class.
+
+See <a href="#CLASS%20CARI3S%3APANGO-BLOCK" class="xref">PANGO-BLOCK</a>
+See <a href="#CLASS%20CARI3S%3AGENERATOR" class="xref">GENERATOR</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATE" class="xref">GENERATE</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:STATUS-BAR"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ASTATUS-BAR">STATUS-BAR</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/status-bar.lisp#L9">Source</a>  </header> <div class="docstring"><pre>Class to represent an i3 status bar.
+
+An instance of this class is capable of handling the i3 protocol
+and invoking a number of block generators at the appropriate times.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AINTERVAL" class="xref">INTERVAL</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ANEXT-TIME" class="xref">NEXT-TIME</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATORS" class="xref">GENERATORS</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AOUTPUT" class="xref">OUTPUT</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AINPUT" class="xref">INPUT</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ACLICK-PAUSE" class="xref">CLICK-PAUSE</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3APRODUCE-OUTPUT" class="xref">PRODUCE-OUTPUT</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3APROCESS" class="xref">PROCESS</a>
+See <a href="#FUNCTION%20CARI3S%3ARUN-BAR" class="xref">RUN-BAR</a></pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:TICK"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3ATICK">TICK</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/protocol.lisp#L100">Source</a>  </header> <div class="docstring"><pre>Basic class for period update events.</pre></div> </article> </li>  <li> <article class="definition class" id="CLASS CARI3S:VALUE-GENERATOR"> <header> <span class="visibility">EXTERNAL</span> <span class="type">CLASS</span> <h4 class="name"> <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR">VALUE-GENERATOR</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators.lisp#L24">Source</a>  </header> <div class="docstring"><pre>Superclass for all block generators that generate their text content based on some computed value.
+
+The TEXT and SHORT-TEXT of a value-generator should be format
+strings that may consume however many values the respective
+generator promises to supply.
+
+Note that the pango markup for both text and short-text is
+applied AFTER the format string has been formatted in order to
+avoid encoding issues with entities in format directives.
+
+A concrete class of a value-generator must supply a primary
+method on COMPUTE-VALUE.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ACOMPUTE-VALUE" class="xref">COMPUTE-VALUE</a>
+See <a href="#CLASS%20CARI3S%3ASINGLE-GENERATOR" class="xref">SINGLE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION CARI3S:LOAD-FROM-FILE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20CARI3S%3ALOAD-FROM-FILE">LOAD-FROM-FILE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">FILE</li> </ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/toplevel.lisp#L9">Source</a>  </header> <div class="docstring"><pre>Loads a status bar definition from the given file.
+
+The file should have the following format:
+
+  DEFINITION ::= (INITARG|GENERATOR)*
+  INITARG    ::= keyword value
+  GENERATOR  ::= (NAME INITARG*)
+  NAME       --- A symbol naming the class of the generator.
+
+So for instance a simple file for a status bar with a two-second
+interval, a clock generator, and a cpu-usage generator would look as
+follows:
+
+  :interval 2
+  (clock :text &quot;~4@*~2d:~2,'0d:~2,'0d&quot;)
+  (cpu-usage)
+
+See <a href="#CLASS%20CARI3S%3AGENERATOR" class="xref">GENERATOR</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION CARI3S:RUN-BAR"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20CARI3S%3ARUN-BAR">RUN-BAR</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">BAR</li>  <li class="argument">&amp;KEY</li>  <li class="argument">(PAUSE 1/30)</li>  <li class="argument">(CLICK-EVENTS-P T)</li> </ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/status-bar.lisp#L58">Source</a>  </header> <div class="docstring"><pre>Starts the i3bar protocol and continuously processes the status bar.
+
+If click-events-p is T, i3 will send click events to the status bar.
+Pause is the minimal number of seconds between calls to PROCESS.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3APROCESS" class="xref">PROCESS</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION CARI3S:RUN-BAR-FROM-FILE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20CARI3S%3ARUN-BAR-FROM-FILE">RUN-BAR-FROM-FILE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">&amp;OPTIONAL</li>  <li class="argument">(FILE ~/.config/i3/cari3s.conf)</li> </ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/toplevel.lisp#L25">Source</a>  </header> <div class="docstring"><pre>Runs a status bar initialised from a file.
+
+See <a href="#FUNCTION%20CARI3S%3ALOAD-FROM-FILE" class="xref">LOAD-FROM-FILE</a>
+See <a href="#FUNCTION%20CARI3S%3ARUN-BAR" class="xref">RUN-BAR</a></pre></div> </article> </li>  <li> <article class="definition function callable" id="FUNCTION CARI3S:TOPLEVEL"> <header> <span class="visibility">EXTERNAL</span> <span class="type">FUNCTION</span> <h4 class="name"> <a href="#FUNCTION%20CARI3S%3ATOPLEVEL">TOPLEVEL</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"></ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/toplevel.lisp#L28">Source</a>  </header> <div class="docstring"><pre>Lisp binary toplevel entry function.
+
+This simply calls RUN-BAR-FROM-FILE, passing along the command line
+options to the binary.</pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:ALIGN"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AALIGN">ALIGN</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the text alignment property of the block.
+
+Can be one of: :center :right :left
+Defaults to :left
+
+Note that alignment is only in effect if the min-width has not been
+reached.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF ALIGN)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20ALIGN%29">(SETF ALIGN)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:BACKGROUND"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ABACKGROUND">BACKGROUND</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the background colour of the block.
+
+A colour can either be an encoded RGB integer, or a list of R, G, B,
+and optional A elements with each element being an integer between
+0 and 255.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF BACKGROUND)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20BACKGROUND%29">(SETF BACKGROUND)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:BLOCK-SIZE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ABLOCK-SIZE">BLOCK-SIZE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the block's screen dimensions.
+
+The dimensions is a cons of WIDTH and HEIGHT sizes in pixels.
+
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF BLOCK-SIZE)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20BLOCK-SIZE%29">(SETF BLOCK-SIZE)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:BORDER"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ABORDER">BORDER</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the border colour of the block.
+
+A colour can either be an encoded RGB integer, or a list of R, G, B,
+and optional A elements with each element being an integer between
+0 and 255.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF BORDER)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20BORDER%29">(SETF BORDER)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:BUTTON"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ABUTTON">BUTTON</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the X11 button ID that was used to perform the click.
+
+By default this should be:
+  1 -- left
+  2 -- middle
+  3 -- right
+
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF BUTTON)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20BUTTON%29">(SETF BUTTON)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:CLICK-PAUSE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ACLICK-PAUSE">CLICK-PAUSE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the number of seconds that the next tick event is delayed to when a click event has come in.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3APROCESS" class="xref">PROCESS</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ANEXT-TIME" class="xref">NEXT-TIME</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF CLICK-PAUSE)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20CLICK-PAUSE%29">(SETF CLICK-PAUSE)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:COMPUTE-VALUE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ACOMPUTE-VALUE">COMPUTE-VALUE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">VALUE-GENERATOR</li> </ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators.lisp#L27">Source</a>  </header> <div class="docstring"><pre>Computes the values used for the format string in a value-generator's text.
+
+This function is called whenever GENERATE is called on the
+value-generator.
+
+See <a href="#CLASS%20CARI3S%3AVALUE-GENERATOR" class="xref">VALUE-GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:CONTINUE-SIGNAL"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ACONTINUE-SIGNAL">CONTINUE-SIGNAL</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>The unix signal used to continue bar updates.
+
+Defaults to 18 (SIGCONT)
+
+See <a href="#CLASS%20CARI3S%3AHEADER" class="xref">HEADER</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF CONTINUE-SIGNAL)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20CONTINUE-SIGNAL%29">(SETF CONTINUE-SIGNAL)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:FOREGROUND"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AFOREGROUND">FOREGROUND</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the foreground text colour of the block.
+
+A colour can either be an encoded RGB integer, or a list of R, G, B,
+and optional A elements with each element being an integer between
+0 and 255.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF FOREGROUND)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20FOREGROUND%29">(SETF FOREGROUND)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:GENERATE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATE">GENERATE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">GENERATOR</li>  <li class="argument">EVENT</li> </ul>  <a class="source-link" href="https://github.com/Shinmera/cari3s/blob/master/generators.lisp#L12">Source</a>  </header> <div class="docstring"><pre>Generates a list of blocks to use in the status bar.
+
+The event should be an instance of an EVENT subclass, which
+allows the generator to react to user input such as clicks.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a>
+See <a href="#CLASS%20CARI3S%3AGENERATOR" class="xref">GENERATOR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:GENERATORS"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATORS">GENERATORS</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the list of generators that the status-bar invokes to generate its output.
+
+See <a href="#CLASS%20CARI3S%3AGENERATOR" class="xref">GENERATOR</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF GENERATORS)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20GENERATORS%29">(SETF GENERATORS)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:INPUT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AINPUT">INPUT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the input stream from which the status-bar reads click events.
+
+This defaults to *STANDARD-INPUT*
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3APROCESS" class="xref">PROCESS</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF INPUT)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20INPUT%29">(SETF INPUT)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:INSTANCE"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AINSTANCE">INSTANCE</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the instance name of the block.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ANAME" class="xref">NAME</a>
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a>
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF INSTANCE)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20INSTANCE%29">(SETF INSTANCE)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:INTERVAL"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AINTERVAL">INTERVAL</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the interval in seconds in which tick events are fired.
+
+The default interval is one second.
+
+Unless click events are fired and click-pause is set, the status-
+bar's generators are fired with a tick event according to this
+interval.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ANEXT-TIME" class="xref">NEXT-TIME</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF INTERVAL)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20INTERVAL%29">(SETF INTERVAL)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:LOCATION"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ALOCATION">LOCATION</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the screen position of the click.
+
+The location is a cons of X and Y coordinates, relative to the top
+left corner of the X11 root window in pixels.
+
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF LOCATION)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20LOCATION%29">(SETF LOCATION)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:MARKUP"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AMARKUP">MARKUP</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the list of markup regions for the pango block's text.
+
+See <a href="#CLASS%20CARI3S%3APANGO-BLOCK" class="xref">PANGO-BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF MARKUP)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20MARKUP%29">(SETF MARKUP)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:MIN-WIDTH"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AMIN-WIDTH">MIN-WIDTH</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the minimum pixel width of the block.
+
+From i3docs:
+The minimum width (in pixels) of the block. If the content of the
+text key take less space than the specified min-width, the block
+will be padded to the left and/or the right side, according to the
+align key. This is useful when you want to prevent the whole
+status line to shift when value take more or less space between each
+iteration. The value can also be a string. In this case, the width
+of the text given by min-width determines the minimum width of the
+block. This is useful when you want to set a sensible minimum width
+regardless of which font you are using, and at what particular size.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF MIN-WIDTH)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20MIN-WIDTH%29">(SETF MIN-WIDTH)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:NAME"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ANAME">NAME</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the name of the block.
+
+From i3docs:
+Every block should have a unique name (string) entry so that it can
+be easily identified in scripts which process the output. i3bar
+completely ignores the name and instance fields. Make sure to also
+specify an instance (string) entry where appropriate. For example,
+the user can have multiple disk space blocks for multiple mount
+points.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AINSTANCE" class="xref">INSTANCE</a>
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a>
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF NAME)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20NAME%29">(SETF NAME)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:NEXT-TIME"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ANEXT-TIME">NEXT-TIME</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the next time a tick event should be fired.
+
+This is automatically updated when a tick event has fired or when a
+click event has fired and click-pause is set.
+
+The value is in internal-time-units.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AINTERVAL" class="xref">INTERVAL</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ACLICK-PAUSE" class="xref">CLICK-PAUSE</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF NEXT-TIME)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20NEXT-TIME%29">(SETF NEXT-TIME)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:OUTPUT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AOUTPUT">OUTPUT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the output stream to which the status-bar writes its results.
+
+This defaults to *STANDARD-OUTPUT*
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3APRODUCE-OUTPUT" class="xref">PRODUCE-OUTPUT</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF OUTPUT)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20OUTPUT%29">(SETF OUTPUT)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:PROCESS"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3APROCESS">PROCESS</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">BAR</li> </ul>  </header> <div class="docstring"><pre>Processes the status-bar, causing it to potentially read inputs and generate outputs.
+
+First the input is checked for a new click event. If one is there,
+it is parsed from the stream and output is produced according to
+GENERATE on the generators and the click event. If click-pause is
+set, the next-time is delayed by click-pause number of seconds from
+the current time.
+
+Next the next-time is checked against the current internal real
+time. If the time has passed, output is produced according to
+GENERATE on the generators and a new tick event. The next-time is
+then delayed by interval number of seconds from the current time.
+
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a>
+See <a href="#CLASS%20CARI3S%3ATICK" class="xref">TICK</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ANEXT-TIME" class="xref">NEXT-TIME</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3ACLICK-PAUSE" class="xref">CLICK-PAUSE</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AINTERVAL" class="xref">INTERVAL</a>
+See <a href="#CLASS%20CARI3S%3AGENERATOR" class="xref">GENERATOR</a>
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AGENERATORS" class="xref">GENERATORS</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:PRODUCE-OUTPUT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3APRODUCE-OUTPUT">PRODUCE-OUTPUT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">BAR</li>  <li class="argument">PAYLOAD</li> </ul>  </header> <div class="docstring"><pre>Outputs the given payload as JSON to the status-bar's output stream.
+
+See <a href="#GENERIC-FUNCTION%20CARI3S%3AOUTPUT" class="xref">OUTPUT</a>
+See <a href="#CLASS%20CARI3S%3ASTATUS-BAR" class="xref">STATUS-BAR</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:RELATIVE-LOCATION"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ARELATIVE-LOCATION">RELATIVE-LOCATION</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the relative position of the click.
+
+The location is a cons of X and Y coordinates, relative to the top
+left corner of the block itself in pixels.
+
+See <a href="#CLASS%20CARI3S%3ACLICK" class="xref">CLICK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF RELATIVE-LOCATION)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20RELATIVE-LOCATION%29">(SETF RELATIVE-LOCATION)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:SEND-CLICK-EVENTS-P"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ASEND-CLICK-EVENTS-P">SEND-CLICK-EVENTS-P</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Whether i3 should send click updates to the process.
+
+Defaults to NIL
+
+See <a href="#CLASS%20CARI3S%3AHEADER" class="xref">HEADER</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF SEND-CLICK-EVENTS-P)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20SEND-CLICK-EVENTS-P%29">(SETF SEND-CLICK-EVENTS-P)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:SEPARATOR"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ASEPARATOR">SEPARATOR</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the block's separator behaviour.
+
+If set should be either T, or a number of pixels for the width of
+the separator. If T, the default i3 behaviour is to use 9 pixels
+of width for the separator.</pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF SEPARATOR)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20SEPARATOR%29">(SETF SEPARATOR)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:SHORT-MARKUP"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ASHORT-MARKUP">SHORT-MARKUP</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the list of markup regions for the pango block's short-text.
+
+See <a href="#CLASS%20CARI3S%3APANGO-BLOCK" class="xref">PANGO-BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF SHORT-MARKUP)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20SHORT-MARKUP%29">(SETF SHORT-MARKUP)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:SHORT-TEXT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ASHORT-TEXT">SHORT-TEXT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the short, alternate text content of the block.
+
+From i3docs:
+Where appropriate, the short-text should also be provided. It
+will be used in case the status line needs to be shortened
+because it uses more space than your screen provides. For
+example, when displaying an IPv6 address, the prefix is
+usually (!) more relevant than the suffix, because the latter
+stays constant when using autoconf, while the prefix changes.
+When displaying the date, the time is more important than the
+date (it is more likely that you know which day it is than
+what time it is).
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF SHORT-TEXT)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20SHORT-TEXT%29">(SETF SHORT-TEXT)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:STOP-SIGNAL"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ASTOP-SIGNAL">STOP-SIGNAL</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>The unix signal used to pause bar updates.
+
+Defaults to 19 (SIGSTOP)
+
+See <a href="#CLASS%20CARI3S%3AHEADER" class="xref">HEADER</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF STOP-SIGNAL)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20STOP-SIGNAL%29">(SETF STOP-SIGNAL)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:TEXT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ATEXT">TEXT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to the full textual content of the block.
+
+This field is required to be set.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF TEXT)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20TEXT%29">(SETF TEXT)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:TEXT-FORMAT"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3ATEXT-FORMAT">TEXT-FORMAT</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">BLOCK</li> </ul>  </header> <div class="docstring"><pre>Returns the text format used by the block's text content.
+
+Defaults to :none
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:URGENT-P"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AURGENT-P">URGENT-P</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>Accessor to whether the block is considered urgent or not.
+
+From i3docs:
+A boolean which specifies whether the current value is urgent.
+Examples are battery charge values below 1 percent or no more
+available disk space (for non-root users). The presentation of
+urgency is up to i3bar.
+
+See <a href="http://l1sp.org/cl/block" class="xref">BLOCK</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF URGENT-P)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20URGENT-P%29">(SETF URGENT-P)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:VERSION"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3AVERSION">VERSION</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><pre>The version integer of the protocol that is used.
+
+Defaults to 1.
+
+See <a href="#CLASS%20CARI3S%3AHEADER" class="xref">HEADER</a></pre></div> </article> </li>  <li> <article class="definition generic-function callable" id="GENERIC-FUNCTION CARI3S:(SETF VERSION)"> <header> <span class="visibility">EXTERNAL</span> <span class="type">GENERIC-FUNCTION</span> <h4 class="name"> <a href="#GENERIC-FUNCTION%20CARI3S%3A%28SETF%20VERSION%29">(SETF VERSION)</a> </h4> <ul class="qualifiers"></ul> <ul class="arguments"> <li class="argument">NEW-VALUE</li>  <li class="argument">OBJECT</li> </ul>  </header> <div class="docstring"><i>No documentation provided.</i></div> </article> </li> </ul> </article> </li> </ul> </section> </article> <script>window.addEventListener("DOMContentLoaded", function(){
+    var unmarkElement = function(el){
+        if(el.tagName === "mark" || el.tagName === "MARK"){
+            [].forEach.call(el.childNodes, function(child){
+                el.parentNode.insertBefore(child, el);
+            });
+            el.parentNode.removeChild(el);
+        }else if(el.parentNode.tagName === "mark"){
+            return unmarkElement(el.parentNode);
+        }
+        return null;
+    }
+
+    var unmarkAll = function(root){
+        root = root || document;
+        [].forEach.call(root.querySelectorAll("mark"), unmarkElement);
+    }
+    
+    var markElement = function(el){
+        if(el.parentNode.tagName === "mark" || el.parentNode.tagName === "MARK"){
+            return el.parentNode;
+        } else {
+            unmarkAll();
+            var marked = document.createElement("mark");
+            el.parentNode.insertBefore(marked, el);
+            marked.appendChild(el);
+            return marked;
+        }
+    }
+
+    var markFragmented = function(){
+        if(window.location.hash){
+            var el = document.getElementById(decodeURIComponent(window.location.hash.substr(1)));
+            if(el) markElement(el);
+        }
+    }
+
+    var registerXrefLink = function(link){
+        var el = document.getElementById(decodeURIComponent(link.getAttribute("href").substr(1)));
+        if(el){
+            link.addEventListener("click", function(){
+                markElement(el);
+            });
+        }
+    }
+
+    var registerXrefLinks = function(root){
+        root = root || document;
+        [].forEach.call(root.querySelectorAll("a.xref"), registerXrefLink);
+    }
+
+    markFragmented();
+    registerXrefLinks();
+}); </script> </body> </html> 
