@@ -43,7 +43,20 @@
    #:name
    #:instance
    #:urgent-p
-   #:separator)
+   #:separator
+   #:text-format
+   #:pango-block
+   #:markup
+   #:short-markup
+   #:event
+   #:tick
+   #:click
+   #:name
+   #:instance
+   #:button
+   #:location
+   #:relative-location
+   #:block-size)
   ;; status-bar.lisp
   (:export
    #:status-bar

@@ -97,7 +97,7 @@
 (defclass event ()
   ())
 
-(defclass ping (event)
+(defclass tick (event)
   ())
 
 (defclass click (event)

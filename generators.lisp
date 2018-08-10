@@ -11,12 +11,15 @@
 
 (defgeneric generate (generator event))
 
-(defclass single-generator (pango-block)
+(defclass single-generator (generator pango-block)
   ())
+
+(defmethod initialize-instance :after ((generator single-generator) &key name)
+  (unless name (setf (name generator) (string (class-name (class-of generator))))))
 
 (defmethod generate :around ((generator single-generator) event)
   (call-next-method)
-  generator)
+  (list generator))
 
 (defclass value-generator (single-generator)
   ((value :initform NIL :accessor value)))
