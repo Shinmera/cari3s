@@ -52,7 +52,7 @@
     (setf (next-time bar) (+ (get-internal-real-time)
                              (* (interval bar) INTERNAL-TIME-UNITS-PER-SECOND)))))
 
-(defun toplevel (bar &key (pause 1/30))
+(defun run-bar (bar &key (pause 1/30))
   (jonathan:with-output ((output bar))
     (jonathan:%to-json (make-instance 'header :send-click-events-p T)))
   (format (output bar) "~%[~%")
@@ -60,3 +60,26 @@
        (loop (process bar)
              (sleep pause))
     (write-line "]" (output bar))))
+
+(defun load-from-file (file)
+  (with-open-file (i file)
+    (let ((*package* #.*package*)
+          (initargs ())
+          (generators ()))
+      (loop with eof = (make-symbol "EOF")
+            for item = (read i NIL eof)
+            until (eql item eof)
+            do (etypecase item
+                 (symbol
+                  (push (read i) initargs)
+                  (push item initargs))
+                 (cons
+                  (push (apply #'make-instance item) generators))))
+      (apply #'make-instance :generators generators initargs))))
+
+(defun run-bar-from-file (&optional (file #p"~/.config/i3/cari3s.conf"))
+  (toplevel (load-from-file file)))
+
+(defun toplevel ()
+  (let ((args (uiop:command-line-arguments)))
+    (apply #'run-bar-from-file args)))
