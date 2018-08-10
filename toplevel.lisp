@@ -75,10 +75,10 @@
                   (push item initargs))
                  (cons
                   (push (apply #'make-instance item) generators))))
-      (apply #'make-instance :generators generators initargs))))
+      (apply #'make-instance 'status-bar :generators (nreverse generators) initargs))))
 
 (defun run-bar-from-file (&optional (file #p"~/.config/i3/cari3s.conf"))
-  (toplevel (load-from-file file)))
+  (run-bar (load-from-file file)))
 
 (defun toplevel ()
   (let ((args (uiop:command-line-arguments)))
