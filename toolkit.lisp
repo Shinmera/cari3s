@@ -45,6 +45,10 @@
   (declare (ignore args))
   (format-escape o color))
 
+(defmethod format-color (o (color integer) &rest args)
+  (declare (ignore args))
+  (format o "#~6,'0x" color))
+
 (defmethod format-color (o (color list) &rest args)
   (declare (ignore args))
   (apply #'format o "#~2,'0x~2,'0x~2,'0x~@[~2,'0x~]" color))

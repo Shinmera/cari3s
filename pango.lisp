@@ -82,7 +82,7 @@
 
 (defun markup-regions (text regions)
   (let ((additions (make-hash-table :test 'eql)))
-    (loop for (start end markup) in regions
+    (loop for (start end . markup) in regions
           do (push (markup-tag markup) (gethash start additions))
              (push "</span>" (gethash end additions)))
     (with-output-to-string (o)
