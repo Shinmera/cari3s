@@ -14,12 +14,13 @@
 You may supply the name of the battery of interest using the
 :BATTERY initarg. It defaults to the first battery device.
 
-This value-generator supplies the following five values:
+This value-generator supplies the following six values:
   0. charge-percentage
   1. charging-p
-  2. hours-remaining
-  3. minutes-remaining
-  4. seconds-remaining
+  2. discharging-p
+  3. hours-remaining
+  4. minutes-remaining
+  5. seconds-remaining
 
 See VALUE-GENERATOR")
 
