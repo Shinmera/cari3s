@@ -15,7 +15,7 @@
   ())
 
 (defmethod initialize-instance :after ((generator single-generator) &key name)
-  (unless name (setf (name generator) (string (class-name (class-of generator))))))
+  (unless name (setf (name generator) (string-downcase (class-name (class-of generator))))))
 
 (defmethod generate :around ((generator single-generator) event)
   (call-next-method)
