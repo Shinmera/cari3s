@@ -28,4 +28,7 @@
                (:file "documentation"))
   :depends-on (:jonathan
                :cffi
-               :documentation-utils))
+               :documentation-utils)
+  :build-operation "program-op"
+  :build-pathname "cari3s"
+  :entry-point "cari3s:toplevel")
