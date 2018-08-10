@@ -7,16 +7,16 @@
 (in-package #:org.shirakumo.cari3s)
 
 (defclass battery (value-generator)
-  ((battery :initarg :battery :accessor battery))
+  ((battery-name :initarg :battery :accessor battery-name))
   (:default-initargs
    :text "BAT ~4,1f% ~:[🡇~;🡅~] ~d:~2,'0d"
    :battery T
    :markup '((0 3 :color #x0088EE))))
 
 (defmethod compute-value ((generator battery))
-  (let ((battery (or (if (eql T (battery generator))
+  (let ((battery (or (if (eql T (battery-name generator))
                          (first (directory #p"/sys/class/power_supply/BAT*/"))
-                         (make-pathname :directory `(:absolute "sys" "class" "power_supply" ,(battery generator))))
+                         (make-pathname :directory `(:absolute "sys" "class" "power_supply" ,(battery-name generator))))
                      (error "No Battery"))))
     (flet ((r (file) (with-open-file (stream (merge-pathnames file battery) :if-does-not-exist NIL)
                        (let ((*package* #.*package*))
