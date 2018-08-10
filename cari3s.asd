@@ -14,7 +14,6 @@
   :serial T
   :components ((:file "package")
                (:file "toolkit")
-               (:file "pango")
                (:file "protocol")
                (:file "generators")
                (:file "toplevel")
@@ -28,6 +27,7 @@
                (:file "documentation"))
   :depends-on (:jonathan
                :cffi
+               :pango-markup
                :documentation-utils)
   :build-operation "program-op"
   :build-pathname "cari3s"

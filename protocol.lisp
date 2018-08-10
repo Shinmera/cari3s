@@ -87,12 +87,12 @@
 (defmethod text-format ((block pango-block)) :pango)
 
 (defmethod text ((block pango-block))
-  (markup-regions (call-next-method) (markup block)))
+  (pango-markup:markup-regions (call-next-method) (markup block)))
 
 (defmethod short-text ((block pango-block))
   (let ((text (call-next-method)))
     (when text
-      (markup-regions text (short-markup block)))))
+      (pango-markup:markup-regions text (short-markup block)))))
 
 (defclass event ()
   ())

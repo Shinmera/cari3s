@@ -24,9 +24,16 @@
 (defgeneric compute-value (value-generator))
 
 (defmethod text ((generator value-generator))
-  (markup-regions (apply #'format NIL (slot-value generator 'text)
-                         (value generator))
-                  (markup generator)))
+  (pango-markup:markup-regions
+   (apply #'format NIL (slot-value generator 'text) (value generator))
+   (markup generator)))
+
+(defmethod short-text ((generator value-generator))
+  (let ((text (slot-value generator 'short-text)))
+    (when text
+      (pango-markup:markup-regions
+       (apply #'format NIL text (value generator))
+       (short-markup generator)))))
 
 (defmethod generate ((generator value-generator) event)
   (setf (value generator) (compute-value generator)))

@@ -25,29 +25,6 @@
    #:generate
    #:value-generator
    #:compute-value)
-  ;; pango.lisp
-  (:export
-   #:font
-   #:family
-   #:size
-   #:style
-   #:weight
-   #:variant
-   #:stretch
-   #:features
-   #:markup
-   #:font
-   #:foreground
-   #:background
-   #:underline
-   #:rise
-   #:strikethrough
-   #:fallback
-   #:language
-   #:letter-spacing
-   #:gravity
-   #:markup-tag
-   #:markup-regions)
   ;; protocol.lisp
   (:export
    #:header
