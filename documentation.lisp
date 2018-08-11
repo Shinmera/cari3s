@@ -94,7 +94,16 @@ This value-generator supplies the following two values:
   0. ip-address
   1. device-name
 
-See VALUE-GENERATOR"))
+See VALUE-GENERATOR")
+
+  (type uptime
+        "A generator for the current system uptime.
+
+This value-generator supplies the following four values:
+  0. uptime-days (NIL if zero)
+  1. uptime-hours
+  2. uptime-minutes
+  3. uptime-seconds"))
 
 ;; generators.lisp
 (docs:define-docs

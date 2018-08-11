@@ -25,6 +25,7 @@
                (:file "generators/io-usage")
                (:file "generators/mem-usage")
                (:file "generators/network-ip")
+               (:file "generators/uptime")
                (:file "documentation"))
   :depends-on (:jonathan
                :cffi

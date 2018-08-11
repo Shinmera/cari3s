@@ -16,7 +16,8 @@
    #:disk-usage
    #:io-usage
    #:mem-usage
-   #:network-ip)
+   #:network-ip
+   #:uptime)
   ;; generators.lisp
   (:export
    #:generator
