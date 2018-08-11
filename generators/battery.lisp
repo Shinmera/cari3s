@@ -9,7 +9,7 @@
 (defclass battery (value-generator)
   ((battery-name :initarg :battery :accessor battery-name))
   (:default-initargs
-   :text "BAT ~4,1f%~@[ 🡅~]~@[ 🡇~]~@[ ~d:~2,'0d~]"
+   :text "BAT ~4,1f%~:[~; 🡅~]~:[~; 🡇~]~@[ ~d:~2,'0d~]"
    :battery T
    :markup '((0 3 :color #x0088EE))))
 
