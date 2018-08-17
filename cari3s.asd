@@ -10,7 +10,9 @@
   :author "Nicolas Hafner <shinmera@tymoon.eu>"
   :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
   :description "A generator for the i3 status bar."
-  :homepage "https://github.com/Shinmera/cari3s"
+  :homepage "https://Shinmera.github.io/cari3s/"
+  :bug-tracker "https://github.com/Shinmera/cari3s/issues"
+  :source-control (:git "https://github.com/Shinmera/cari3s.git")
   :serial T
   :components ((:file "package")
                (:file "toolkit")
