@@ -116,13 +116,12 @@ that are emitted into the status bar.
 A concrete class of a generator must supply a primary method
 on GENERATE.
 
-See GENERATE")
+See GENERATE
+See INTERVAL
+See PROCESS-EVENT")
 
   (function generate
     "Generates a list of blocks to use in the status bar.
-
-The event should be an instance of an EVENT subclass, which
-allows the generator to react to user input such as clicks.
 
 See BLOCK
 See GENERATOR")
@@ -464,16 +463,17 @@ See PROCESS
 See RUN-BAR")
 
   (function interval
-    "Accessor to the interval in seconds in which tick events are fired.
+    "Accessor to the interval in seconds in which output is generated
 
 The default interval is one second.
 
-Unless click events are fired and click-pause is set, the status-
-bar's generators are fired with a tick event according to this
-interval.
+GENERATE is only called on generators if their own interval has
+expired. They will not be called more frequently than the status-bar's
+own interval however.
 
 See NEXT-TIME
-See STATUS-BAR")
+See STATUS-BAR
+See GENERATOR")
 
   (function next-time
     "Accessor to the next time a tick event should be fired.

@@ -10,6 +10,7 @@
   ((interval :initarg :interval :accessor interval)
    (next-time :initform 0 :accessor next-time)
    (generators :initarg :generators :accessor generators)
+   (blocks :initform (make-hash-table :test 'eq) :accessor blocks)
    (output :initarg :output :accessor output)
    (input :initarg :input :accessor input)
    (click-pause :initarg :click-pause :accessor click-pause))
@@ -20,9 +21,17 @@
    :output *standard-output*
    :input *standard-input*))
 
-(defmethod generate ((bar status-bar) event)
+(defmethod process-event ((event event) (bar status-bar))
   (loop for generator in (generators bar)
-        append (generate generator event)))
+        do (process-event event generator)))
+
+(defmethod generate ((bar status-bar))
+  (loop for generator in (generators bar)
+        do (when (<= (interval generator)
+                     (- (get-internal-real-time)
+                        (last-generation generator)))
+             (setf (gethash generator blocks) (generate generator event)))
+        append (blocks generator bar)))
 
 (defmethod produce-output ((bar status-bar) payload)
   (jonathan:with-output ((output bar))
@@ -43,13 +52,13 @@
   (with-input-ready ((input bar))
     (let* ((table (jonathan:parse (input bar) :as :hash-table))
            (event (click-from-json table)))
-      (produce-output bar (generate bar event)))
+      (process-event event bar))
     (when (click-pause bar)
       (setf (next-time bar) (+ (get-internal-real-time)
                                (* (click-pause bar) INTERNAL-TIME-UNITS-PER-SECOND)))))
   ;; Process periodic output
   (when (<= (next-time bar) (get-internal-real-time))
-    (produce-output bar (generate bar (make-instance 'tick)))
+    (produce-output bar (generate bar))
     (setf (next-time bar) (+ (get-internal-real-time)
                              (* (interval bar) INTERNAL-TIME-UNITS-PER-SECOND)))))
 

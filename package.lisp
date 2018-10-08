@@ -21,6 +21,7 @@
   ;; generators.lisp
   (:export
    #:generator
+   #:interval
    #:generate
    #:single-generator
    #:generate
@@ -57,7 +58,8 @@
    #:button
    #:location
    #:relative-location
-   #:block-size)
+   #:block-size
+   #:process-event)
   ;; status-bar.lisp
   (:export
    #:status-bar

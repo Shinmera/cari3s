@@ -97,9 +97,6 @@
 (defclass event ()
   ())
 
-(defclass tick (event)
-  ())
-
 (defclass click (event)
   ((name :initarg :name :accessor name)
    (instance :initarg :instance :accessor instance)
@@ -123,3 +120,5 @@
                           :location (cons (k "x") (k "y"))
                           :relative-location (cons (k "relative_x") (k "relative_y"))
                           :block-size (cons (k "width") (k "height")))))
+
+(defgeneric process-event (event processor))
