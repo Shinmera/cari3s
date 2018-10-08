@@ -6,6 +6,9 @@
 
 (in-package #:org.shirakumo.cari3s)
 
+(defgeneric to-table (object))
+(defgeneric from-table (type table))
+
 (defclass header ()
   ((version :initarg :version :accessor version)
    (stop-signal :initarg :stop-signal :accessor stop-signal)
@@ -17,12 +20,13 @@
    :continue-signal 18
    :send-click-events-p NIL))
 
-(defmethod jonathan:%to-json ((header header))
-  (jonathan:with-object
-    (jonathan:write-key-value "version" (version header))
-    (jonathan:write-key-value "stop_signal" (stop-signal header))
-    (jonathan:write-key-value "cont_signal" (continue-signal header))
-    (jonathan:write-key-value "click_events" (send-click-events-p header))))
+(defmethod to-table ((header header))
+  (let ((table (make-hash-table)))
+    (setf (gethash "version" table) (version header))
+    (setf (gethash "stop_signal" table) (stop-signal header))
+    (setf (gethash "cont_signal" table) (continue-signal header))
+    (setf (gethash "click_events" table) (send-click-events-p header))
+    table))
 
 (defclass block ()
   ((text :initarg :text :accessor text)
@@ -51,20 +55,19 @@
 
 (defmethod text-format ((block block)) :none)
 
-(defmethod jonathan:%to-json ((block block))
-  (jonathan:with-object
+(defmethod to-table ((block block))
+  (let ((table (make-hash-table)))
     (macrolet ((maybe-output (name value &optional transform)
                  `(let ((%temp ,value))
-                    (when %temp (jonathan:write-key-value
-                                 ,name ,(if transform `(,transform %temp) '%temp))))))
-      (jonathan:write-key-value "full_text" (text block))
+                    (when %temp (setf (gethash ,name table) ,(if transform `(,transform %temp) '%temp))))))
+      (setf (gethash "full_text" table) (text block))
       (maybe-output "short_text" (short-text block))
       (maybe-output "color" (foreground block) format-color-string)
       (maybe-output "background" (background block) format-color-string)
       (maybe-output "border" (border block) format-color-string)
       (maybe-output "min_width" (min-width block))
       (unless (eql :left (align block))
-        (jonathan:write-key-value "align" (ecase (align block)
+        (setf (gethash "align" table) (ecase (align block)
                                             (:center "center")
                                             (:right "right"))))
       (maybe-output "name" (name block))
@@ -73,9 +76,9 @@
       (when (separator block)
         (maybe-output "separator" T)
         (when (numberp (separator block))
-          (jonathan:write-key-value "separator_block_width" (separator block))))
+          (setf (gethash "separator_block_width" table) (separator block))))
       (unless (eql :none (text-format block))
-        (jonathan:write-key-value "markup" (string-downcase (text-format block)))))))
+        (setf (gethash "markup" table) (string-downcase (text-format block)))))))
 
 (defclass pango-block (block)
   ((markup :initarg :markup :accessor markup)
@@ -112,13 +115,13 @@
    :relative-location NIL
    :block-size NIL))
 
-(defun click-from-json (table)
+(defmethod from-table ((type (eql 'click)) table)
   (flet ((k (name) (gethash name table)))
-    (make-instance 'click :name (k "name")
-                          :instance (k "instance")
-                          :button (k "button")
-                          :location (cons (k "x") (k "y"))
-                          :relative-location (cons (k "relative_x") (k "relative_y"))
-                          :block-size (cons (k "width") (k "height")))))
+    (make-instance type :name (k "name")
+                        :instance (k "instance")
+                        :button (k "button")
+                        :location (cons (k "x") (k "y"))
+                        :relative-location (cons (k "relative_x") (k "relative_y"))
+                        :block-size (cons (k "width") (k "height")))))
 
-(defgeneric process-event (event processor))
+(defgeneric process-event (event processorq))

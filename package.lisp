@@ -29,6 +29,8 @@
    #:compute-value)
   ;; protocol.lisp
   (:export
+   #:to-table
+   #:from-table
    #:header
    #:version
    #:stop-signal

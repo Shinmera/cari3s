@@ -29,7 +29,7 @@
                (:file "generators/network-ip")
                (:file "generators/uptime")
                (:file "documentation"))
-  :depends-on (:jonathan
+  :depends-on (:yason
                :cffi
                :pango-markup
                :documentation-utils)

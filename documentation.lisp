@@ -171,6 +171,30 @@ See VALUE-GENERATOR"))
 
 ;; protocol.lisp
 (docs:define-docs
+  (function to-table
+    "Turn the object into a table of basic types.
+
+This is intended for json serialisation. Allowed types are:
+- hash-table
+- string
+- list
+- vector
+- number
+- T
+- NIL")
+
+  (function from-table
+    "Generate an object from a table of basic types.
+
+This is intended for json deserialisation. Allowed types are:
+- hash-table
+- string
+- list
+- vector
+- number
+- T
+- NIL")
+  
   (type header
     "Class representing the i3bar protocol header.
 

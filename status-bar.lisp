@@ -34,8 +34,7 @@
         append (blocks generator bar)))
 
 (defmethod produce-output ((bar status-bar) payload)
-  (jonathan:with-output ((output bar))
-    (jonathan:%to-json payload))
+  (yason:encode (to-table payload) (output bar))
   (format (output bar) ",~%"))
 
 (defmacro with-input-ready ((stream) &body body)
@@ -50,8 +49,8 @@
 (defmethod process ((bar status-bar))
   ;; Process potentially pending inputs
   (with-input-ready ((input bar))
-    (let* ((table (jonathan:parse (input bar) :as :hash-table))
-           (event (click-from-json table)))
+    (let* ((table (yason:parse (input bar)))
+           (event (from-table 'click table)))
       (process-event event bar))
     (when (click-pause bar)
       (setf (next-time bar) (+ (get-internal-real-time)
@@ -63,8 +62,7 @@
                              (* (interval bar) INTERNAL-TIME-UNITS-PER-SECOND)))))
 
 (defun run-bar (bar &key (pause 1/30) (click-events-p NIL))
-  (jonathan:with-output ((output bar))
-    (jonathan:%to-json (make-instance 'header :send-click-events-p click-events-p)))
+  (yason:encode (to-table (make-instance 'header :send-click-events-p click-events-p)) (output bar))
   (format (output bar) "~%[~%")
   (unwind-protect
        (let ((start (get-internal-real-time)))
