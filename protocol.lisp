@@ -96,32 +96,3 @@
   (let ((text (call-next-method)))
     (when text
       (pango-markup:markup-regions text (short-markup block)))))
-
-(defclass event ()
-  ())
-
-(defclass click (event)
-  ((name :initarg :name :accessor name)
-   (instance :initarg :instance :accessor instance)
-   (button :initarg :button :accessor button)
-   (location :initarg :location :accessor location)
-   (relative-location :initarg :relative-location :accessor relative-location)
-   (block-size :initarg :block-size :accessor block-size))
-  (:default-initargs
-   :name NIL
-   :instance NIL
-   :button 1
-   :location NIL
-   :relative-location NIL
-   :block-size NIL))
-
-(defmethod from-table ((type (eql 'click)) table)
-  (flet ((k (name) (gethash name table)))
-    (make-instance type :name (k "name")
-                        :instance (k "instance")
-                        :button (k "button")
-                        :location (cons (k "x") (k "y"))
-                        :relative-location (cons (k "relative_x") (k "relative_y"))
-                        :block-size (cons (k "width") (k "height")))))
-
-(defgeneric process-event (event processorq))

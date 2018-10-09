@@ -489,7 +489,8 @@ See RUN-BAR")
   (function interval
     "Accessor to the interval in seconds in which output is generated
 
-The default interval is one second.
+The default interval is one second for generators, and 0.1 seconds for
+status-bars.
 
 GENERATE is only called on generators if their own interval has
 expired. They will not be called more frequently than the status-bar's

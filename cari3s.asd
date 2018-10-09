@@ -17,6 +17,7 @@
   :components ((:file "package")
                (:file "toolkit")
                (:file "protocol")
+               (:file "event")
                (:file "generators")
                (:file "status-bar")
                (:file "toplevel")
@@ -31,7 +32,9 @@
                (:file "documentation"))
   :depends-on (:yason
                :cffi
+               :usocket
                :pango-markup
+               :closer-mop
                :documentation-utils)
   :build-operation "program-op"
   :build-pathname "cari3s"
