@@ -7,7 +7,7 @@
 (in-package #:org.shirakumo.cari3s)
 
 (defclass generator ()
-  ((last-generation :initform 0 :accessor last-generation)
+  ((last-generation :initform most-negative-fixnum :accessor last-generation)
    (interval :initarg :interval :accessor interval))
   (:default-initargs :interval 1))
 

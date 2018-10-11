@@ -32,7 +32,7 @@
 
 (defmethod process-event ((event generate) (bar status-bar))
   (dolist (generator (generators bar))
-    (setf (last-generation generator) 0))
+    (setf (last-generation generator) most-negative-fixnum))
   (produce-output bar (generate bar)))
 
 (defmethod generate ((bar status-bar))
