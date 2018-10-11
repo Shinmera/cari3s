@@ -51,7 +51,7 @@
    :name NIL
    :instance NIL
    :urgent-p NIL
-   :separator NIL))
+   :separator T))
 
 (defmethod text-format ((block block)) :none)
 
@@ -73,10 +73,10 @@
       (maybe-output "name" (name block))
       (maybe-output "instance" (instance block))
       (maybe-output "urgent" (urgent-p block))
-      (when (separator block)
-        (maybe-output "separator" T)
-        (when (numberp (separator block))
-          (setf (gethash "separator_block_width" table) (separator block))))
+      (if (separator block)
+          (when (numberp (separator block))
+            (setf (gethash "separator_block_width" table) (separator block)))
+          (maybe-output "separator" NIL))
       (unless (eql :none (text-format block))
         (setf (gethash "markup" table) (string-downcase (text-format block)))))))
 
