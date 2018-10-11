@@ -103,7 +103,25 @@ This value-generator supplies the following four values:
   0. uptime-days (NIL if zero)
   1. uptime-hours
   2. uptime-minutes
-  3. uptime-seconds"))
+  3. uptime-seconds")
+
+  (type weather
+    "A generator for current weather data.
+
+You must specify your darksky.net api-key via the :API-KEY initarg,
+and your global coordinates in the (LAT . LNG) format via the
+:LOCATION initarg.
+
+This requires an active internet connection to function.
+
+This value-generator supplies the following seven values:
+  0. summary
+  1. temperature [C]
+  2. temperature-apparent-p
+  3. apparent-temperature [C]
+  4. humidity [%]
+  5. wind [km/h]
+  6. pressure [hPa]"))
 
 ;; event.lisp
 (docs:define-docs

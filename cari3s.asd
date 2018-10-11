@@ -29,11 +29,13 @@
                (:file "generators/mem-usage")
                (:file "generators/network-ip")
                (:file "generators/uptime")
+               (:file "generators/weather")
                (:file "documentation"))
   :depends-on (:yason
                :cffi
                :usocket
                :pango-markup
+               :drakma
                :closer-mop
                :documentation-utils)
   :build-operation "program-op"

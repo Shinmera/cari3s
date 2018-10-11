@@ -37,6 +37,7 @@ In the above example we defined five generators. The following generators are av
 * `mem-usage`
 * `network-ip`
 * `uptime`
+* `weather`
 
 The look of each of them can be customised through the `:text` format string, and the `:markup` [pango options](https://shinmera.github.io/pango-markup), as well as a variety of extra options for `block`s.
 

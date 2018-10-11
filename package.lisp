@@ -17,7 +17,8 @@
    #:io-usage
    #:mem-usage
    #:network-ip
-   #:uptime)
+   #:uptime
+   #:weather)
   ;; event.lisp
   (:export
    #:event
