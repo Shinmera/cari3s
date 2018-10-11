@@ -40,8 +40,11 @@
         do (when (<= (interval generator)
                      (- (get-internal-real-time)
                         (last-generation generator)))
-             (setf (gethash generator blocks) (generate generator event)))
-        append (blocks generator bar)))
+             (handler-case
+                 (setf (gethash generator (blocks bar)) (generate generator))
+               (error (e)
+                 (format *error-output* "~&~a failed to generate: ~a~%" generator e))))
+        append (gethash generator (blocks bar))))
 
 (defmethod produce-output ((bar status-bar) payload)
   (yason:encode (map 'vector #'to-table payload) (output bar))
