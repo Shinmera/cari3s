@@ -76,9 +76,10 @@
       (if (separator block)
           (when (numberp (separator block))
             (setf (gethash "separator_block_width" table) (separator block)))
-          (maybe-output "separator" NIL))
+          (setf (gethash "separator" table) 'yason:false))
       (unless (eql :none (text-format block))
-        (setf (gethash "markup" table) (string-downcase (text-format block)))))))
+        (setf (gethash "markup" table) (string-downcase (text-format block)))))
+    table))
 
 (defclass pango-block (block)
   ((markup :initarg :markup :accessor markup)
