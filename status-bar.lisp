@@ -37,7 +37,7 @@
 
 (defmethod generate ((bar status-bar))
   (loop for generator in (generators bar)
-        do (when (<= (interval generator)
+        do (when (<= (* (interval generator) INTERNAL-TIME-UNITS-PER-SECOND)
                      (- (get-internal-real-time)
                         (last-generation generator)))
              (handler-case
