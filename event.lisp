@@ -49,10 +49,61 @@
 (defmethod parse-event-or-lose ((string string))
   (let* ((*package* #.*package*)
          (init (loop for start = 0 then next-start
-                    for (token next-start) = (multiple-value-list (read-from-string string NIL NIL :start start))
-                    while token collect token)))
+                     for (token next-start) = (multiple-value-list (read-from-string string NIL NIL :start start))
+                     while token collect token)))
     (destructuring-bind (class &rest initargs &key &allow-other-keys) init
       (apply #'make-instance class initargs))))
+
+(defmethod object-initargs (object)
+  (loop for slot in (c2mop:class-slots (class-of object))
+        for name = (c2mop:slot-definition-name slot)
+        for initargs = (c2mop:slot-definition-initargs slot)
+        for include-p = (and initargs (slot-boundp object name))
+        when include-p collect (first initargs)
+        when include-p collect (slot-value object name)))
+
+(defmethod serialize-object ((object (eql T)) stream)
+  (format stream "T"))
+
+(defmethod serialize-object ((object (eql NIL)) stream)
+  (format stream "NIL"))
+
+(defmethod serialize-object ((object symbol) stream)
+  (when (keywordp object)
+    (write-char #\: stream))
+  (write-string (string-downcase object) stream))
+
+(defmethod serialize-object ((object real) stream)
+  (write object :stream stream))
+
+(defmethod serialize-object ((object cons) stream)
+  (write-char #\( stream)
+  (unwind-protect
+       (progn (serialize-object (car object) stream)
+              (dolist (item (cdr object))
+                (write-char #\  stream)
+                (serialize-object item stream)))
+    (write-char #\) stream)))
+
+(defmethod serialize-object ((object string) stream)
+  (write object :stream stream))
+
+(defun %serialize-object (object stream)
+  (serialize-object (type-of object) stream)
+  (dolist (item (object-initargs object))
+    (write-char #\  stream)
+    (serialize-object item stream)))
+
+(defmethod serialize-object ((object condition) stream)
+  ;; I know this is not portable and I don't care.
+  (%serialize-object object stream))
+
+(defmethod serialize-object ((object structure-object) stream)
+  ;; I know this is not portable and I don't care.
+  (%serialize-object object stream))
+
+(defmethod serialize-object ((object standard-object) stream)
+  (%serialize-object object stream))
 
 (defclass event-server ()
   ((port :initarg :port :reader port)
@@ -72,47 +123,35 @@
   (setf (connections server) ())
   (setf (listener server) ()))
 
-(defmethod object-initargs (object)
-  (loop for slot in (c2mop:class-slots (class-of object))
-        for name = (c2mop:slot-definition-name slot)
-        for initargs = (c2mop:slot-definition-initargs slot)
-        for include-p = (and initargs (slot-boundp object name))
-        when include-p collect (first initargs)
-        when include-p collect (slot-value object name)))
-
-(defmethod serialize-object ((object (eql T)) stream)
-  (format stream "T"))
-
-(defmethod serialize-object ((object condition) stream)
-  (let ((*print-case* :downcase)
-        (*package* #.*package*))
-    (format stream "~s~{ ~s~}" (type-of object) (object-initargs object))))
-
-(defmethod serialize-object ((object standard-object) stream)
-  (let ((*print-case* :downcase)
-        (*package* #.*package*))
-    (format stream "~s~{ ~s~}" (type-of object) (object-initargs object))))
-
 (defmethod process-connections ((server event-server))
   (let ((connections (connections server))
         (listener (listener server)))
-    (when (usocket:wait-for-input listener :timeout 0 :ready-only T)
-      (push (usocket:socket-accept listener) connections)
-      (format *error-output* "~&~a connected~%" (first connections)))
-    (dolist (socket connections)
-      (flet ((send-object (o)
-               (serialize-object o (usocket:socket-stream socket))
-               (terpri (usocket:socket-stream socket))
-               (finish-output (usocket:socket-stream socket))))
-        (handler-case
-            (when (usocket:wait-for-input socket :timeout 0 :ready-only T)
-              (handler-bind ((warning #'send-object))
-                (send-object (process-event (parse-event-or-lose (usocket:socket-stream socket)) server))))
-          ((or stream-error usocket:socket-error) (e)
-            (ignore-errors (usocket:socket-close socket))
-            (setf connections (remove socket connections))
-            (format *error-output* "~&~a disconnected: ~a~%" socket e))
-          (error (e)
-            (format *error-output* "~&~a error: ~a~%" socket e)
-            (send-object e)))))
-    (setf (connections server) connections)))
+    (unwind-protect
+         (progn
+           (loop while (usocket:wait-for-input listener :timeout 0 :ready-only T)
+                 do (push (usocket:socket-accept listener) connections)
+                    (format *error-output* "~&~a connected~%" (first connections)))
+           (dolist (socket connections)
+             (handler-case
+                 (flet ((send-object (o)
+                          (serialize-object o (usocket:socket-stream socket))
+                          (terpri (usocket:socket-stream socket))
+                          (finish-output (usocket:socket-stream socket))))
+                   (loop while (usocket:wait-for-input socket :timeout 0 :ready-only T)
+                         do (handler-case
+                                (handler-bind ((warning #'send-object))
+                                  (mapc #'send-object
+                                        (multiple-value-list
+                                         (process-event (parse-event-or-lose (usocket:socket-stream socket)) server))))
+                              ((or stream-error usocket:socket-error) (e)
+                                (ignore-errors (usocket:socket-close socket))
+                                (setf connections (remove socket connections))
+                                (format *error-output* "~&~a disconnected: ~a~%" socket e))
+                              (error (e)
+                                (format *error-output* "~&~a error: ~a~%" socket e)
+                                (send-object e)))))
+               (error (e)
+                 (ignore-errors (usocket:socket-close socket))
+                 (setf connections (remove socket connections))
+                 (format *error-output* "~&~a disconnected: ~a~%" socket e)))))
+      (setf (connections server) connections))))

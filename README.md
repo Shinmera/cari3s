@@ -48,3 +48,10 @@ There's some helper classes available like the `single-generator` and the `value
 For the `value-generator` all you need to implement is a method on `compute-value` and provide a sensible default `:text` initarg.
 
 None of the existing generators are terribly complicated, so if you're still unsure what to do, have a look at their sources.
+
+## Interfacing with Cari3s
+Cari3s includes a TCP server that can be used for RPC. By default the server listens on port 2424. It uses a simple UTF-8 protocol that works on a per-line basis. Each line sent by a client should be formatted something like this:
+
+    echo :message "hi!"
+
+The server will reply in the same format. See `serialize-object` for the complete format spec. You can use this interface in order to interface with and extend Cari3s with other applications.

@@ -18,6 +18,30 @@
    #:mem-usage
    #:network-ip
    #:uptime)
+  ;; event.lisp
+  (:export
+   #:event
+   #:generate
+   #:echo
+   #:message
+   #:click
+   #:name
+   #:instance
+   #:button
+   #:location
+   #:relative-location
+   #:block-size
+   #:process-event
+   #:parse-event-or-lose
+   #:object-initargs
+   #:serialize-object
+   #:event-server
+   #:port
+   #:listener
+   #:connections
+   #:start
+   #:stop
+   #:process-connections)
   ;; generators.lisp
   (:export
    #:generator
@@ -51,17 +75,7 @@
    #:text-format
    #:pango-block
    #:markup
-   #:short-markup
-   #:event
-   #:tick
-   #:click
-   #:name
-   #:instance
-   #:button
-   #:location
-   #:relative-location
-   #:block-size
-   #:process-event)
+   #:short-markup)
   ;; status-bar.lisp
   (:export
    #:status-bar

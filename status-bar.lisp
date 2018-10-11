@@ -22,15 +22,18 @@
    :input *standard-input*))
 
 (defmethod process-event ((event event) (bar status-bar))
-  (loop for generator in (generators bar)
-        do (process-event event generator)))
+  (values-list
+   (loop for generator in (generators bar)
+         for response = (process-event event generator)
+         when response collect response)))
 
 (defmethod process-event ((event echo) (bar status-bar))
   event)
 
 (defmethod process-event ((event generate) (bar status-bar))
-  ;; FIXME
-  ())
+  (dolist (generator (generators bar))
+    (setf (last-generation generator) 0))
+  (produce-output bar (generate bar)))
 
 (defmethod generate ((bar status-bar))
   (loop for generator in (generators bar)

@@ -97,13 +97,213 @@ This value-generator supplies the following two values:
 See VALUE-GENERATOR")
 
   (type uptime
-        "A generator for the current system uptime.
+    "A generator for the current system uptime.
 
 This value-generator supplies the following four values:
   0. uptime-days (NIL if zero)
   1. uptime-hours
   2. uptime-minutes
   3. uptime-seconds"))
+
+;; event.lisp
+(docs:define-docs
+  (type event
+    "Superclass for all events that might happen in the system.
+
+See PROCESS-EVENT")
+
+  (type generate
+    "An event to signal that blocks should be generated immediately.
+
+This event does not reach generators.
+
+See event")
+
+  (type echo
+    "An event that is sent back over the connection as-is.
+
+This event does not reach generators.
+
+See event")
+  
+  (type click
+    "Class representing a click event being fired on a block.
+
+This event comes from i3 itself if the connection was opened with
+a header that has SEND-CLICK-EVENTS-P set to T.
+
+See NAME
+See INSTANCE
+See BUTTON
+See LOCATION
+See RELATIVE-LOCATION
+See BLOCK-SIZE")
+  
+  (function button
+    "Accessor to the X11 button ID that was used to perform the click.
+
+By default this should be:
+  1 -- left
+  2 -- middle
+  3 -- right
+
+See CLICK")
+  
+  (function location
+    "Accessor to the screen position of the click.
+
+The location is a cons of X and Y coordinates, relative to the top
+left corner of the X11 root window in pixels.
+
+See CLICK")
+  
+  (function relative-location
+    "Accessor to the relative position of the click.
+
+The location is a cons of X and Y coordinates, relative to the top
+left corner of the block itself in pixels.
+
+See CLICK")
+  
+  (function block-size
+    "Accessor to the block's screen dimensions.
+
+The dimensions is a cons of WIDTH and HEIGHT sizes in pixels.
+
+See CLICK")
+
+  (function process-event
+    "Causes the given event to be processed by the specified receiver.
+
+If the receiver does not understand the event, an error is
+signalled. In the case of a status-bar, unknown events are passed
+on to its generators. In the case of a generator, unknown events
+are ignored.
+
+You should add methods to this as necessary in order to interface
+your object with the general event system.
+
+See EVENT")
+
+  (function parse-event-or-lose
+    "Attempts to parse an event from the given source, signalling an error on failure.
+
+This will return an EVENT instance.
+
+See EVENT")
+
+  (function object-initargs
+    "Returns a list of initargs to reconstruct the given object with make-instance.
+
+By default this simply  gathers a list of all slots that are
+bound and that have at least one initarg. This is for the purpose
+of reconstructing the object after serialisation.
+
+You may add methods in case you want more precise control over
+the reconstruction of the object.")
+
+  (function serialize-object
+    "Serialises the object to the given stream in the event protocol format.
+
+The event protocol format is an UTF-8 based format:
+  OBJECT    ::= \"NIL\" | \"T\" | INSTANCE
+  INSTANCE  ::= CLASS-NAME INITARG*
+  INITARG   ::= keyword VALUE
+  VALUE     ::= symbol | string | real | list
+
+Programs that intend on parsing events or return values
+from Cari3s need to be able to parse this format and
+serialise their respective format to it as well.
+
+Restrictions on the encoding of values:
+- Strings may not contain the Linefeed character.
+- Symbols must be either unqualified (without the package
+  prefix), or keywords.
+- Symbol names may not contain the Linefeed character.
+- Symbol names must be written in all lowercase with the
+  exception of NIL and T which are written all uppercase.
+- Only proper lists are allowed.")
+
+  (type event-server
+    "Represents an event exchange server.
+
+This server runs a TCP listener on a given port on the
+localhost. The port defaults to 2424. Once started, the
+server accepts an arbitrary amount of connections, over which
+events can be issued. An event should follow the format as
+specified in SERIALIZE-OBJECT, and should be followed by a
+single Linefeed. For each event issued, the server will
+respond with one or more objects. The connection is never
+closed by the server except for when the underlying stream is
+closed, or a TCP error occurs and the connection is doomed
+anyway. The client is allowed to terminate the connection at
+any time.
+
+This class on its own does nothing. In order to start the
+server listener, START must be called. STOP can be called
+to end the listener and disconnect all clients. Once started,
+PROCESS-CONNECTIONS must be called regularly in order to accept
+new connections, handle incoming events, and to clean up old
+connections that have disconnected.
+
+See PORT
+See LISTENER
+See CONNECTIONS
+See START
+See STOP
+See PROCESS-CONNECTIONS")
+
+  (function port
+    "The port on which the server listens for connections.
+
+Defaults to 2424.
+
+See EVENT-SERVER")
+
+  (function listener
+    "The server socket to listen for connections on.
+
+This is NIL if the server is not running.
+
+This is not thread-safe to modify.
+
+See EVENT-SERVER")
+
+  (function connections
+    "The list of connected client sockets.
+
+This is not thread-safe to modify.
+
+See EVENT-SERVER")
+
+  (function start
+    "Start the event-server.
+
+If it is already started, an error is signalled.
+
+See EVENT-SERVER")
+
+  (function stop
+    "Stops the event-server.
+
+If it is already stopped, nothing is done.
+
+See EVENT-SERVER")
+
+  (function process-connections
+    "Processes the event-server connections.
+
+This proceeds by listening for new connections and accepting
+them if there are any. It then listens on each socket in
+turn, parsing and processing pending events.
+If a stream or socket error occurs, the connection is removed.
+If another error occurs during parsing or processing, an error
+is sent back to the client.
+
+See PARSE-EVENT-OR-LOSE
+See PROCESS-EVENT
+See SERIALIZE-OBJECT
+See EVENT-SERVER"))
 
 ;; generators.lisp
 (docs:define-docs
@@ -410,63 +610,7 @@ See PANGO-BLOCK")
   (function short-markup
     "Accessor to the list of markup regions for the pango block's short-text.
 
-See PANGO-BLOCK")
-  
-  (type event
-    "Superclass for all events that might trigger a GENERATE.
-
-See TICK
-See CLICK
-See GENERATE")
-  
-  (type tick
-    "Basic class for period update events.")
-  
-  (type click
-    "Class representing a click event being fired on a block.
-
-This event comes from i3 itself if the connection was opened with
-a header that has SEND-CLICK-EVENTS-P set to T.
-
-See NAME
-See INSTANCE
-See BUTTON
-See LOCATION
-See RELATIVE-LOCATION
-See BLOCK-SIZE")
-  
-  (function button
-    "Accessor to the X11 button ID that was used to perform the click.
-
-By default this should be:
-  1 -- left
-  2 -- middle
-  3 -- right
-
-See CLICK")
-  
-  (function location
-    "Accessor to the screen position of the click.
-
-The location is a cons of X and Y coordinates, relative to the top
-left corner of the X11 root window in pixels.
-
-See CLICK")
-  
-  (function relative-location
-    "Accessor to the relative position of the click.
-
-The location is a cons of X and Y coordinates, relative to the top
-left corner of the block itself in pixels.
-
-See CLICK")
-  
-  (function block-size
-    "Accessor to the block's screen dimensions.
-
-The dimensions is a cons of WIDTH and HEIGHT sizes in pixels.
-
-See CLICK"))
+See PANGO-BLOCK"))
 
 ;; status-bar.lisp
 (docs:define-docs
@@ -475,6 +619,7 @@ See CLICK"))
 
 An instance of this class is capable of handling the i3 protocol
 and invoking a number of block generators at the appropriate times.
+It also handles remote client connections through the event-server.
 
 See INTERVAL
 See NEXT-TIME
@@ -484,7 +629,8 @@ See INPUT
 See CLICK-PAUSE
 See PRODUCE-OUTPUT
 See PROCESS
-See RUN-BAR")
+See RUN-BAR
+See EVENT-SERVER")
 
   (function interval
     "Accessor to the interval in seconds in which output is generated
