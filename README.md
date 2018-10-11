@@ -4,7 +4,7 @@ This is an [i3](https://i3wm.org) status bar generator library/program.
 ## How To
 First make sure Cari3s is available to ASDF by either cloning and registering it, or downloading it via Quicklisp. Then build a standalone binary of Cari3s like this:
 
-    sbcl --dynamic-space-size 128MB --eval "(asdf:make :cari3s)"
+    sbcl --eval "(asdf:make :cari3s)"
 
 This should produce a binary called `cari3s` in the source directory. Copy or symlink it into your `PATH`.
 
