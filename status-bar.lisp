@@ -15,7 +15,7 @@
    (input :initarg :input :accessor input)
    (click-pause :initarg :click-pause :accessor click-pause))
   (:default-initargs
-   :interval 0.1
+   :interval 1
    :click-pause 1
    :generators ()
    :output *standard-output*
@@ -42,8 +42,8 @@
                         (last-generation generator)))
              (handler-case
                  (setf (gethash generator (blocks bar)) (generate generator))
-               (error (e)
-                 (format *error-output* "~&~a failed to generate: ~a~%" generator e))))
+               ((or error usocket:ns-try-again-condition) (e)
+                 (eformat "~a failed to generate: ~a" generator e))))
         append (gethash generator (blocks bar))))
 
 (defmethod produce-output ((bar status-bar) payload)

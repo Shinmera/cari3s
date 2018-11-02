@@ -6,6 +6,9 @@
 
 (in-package #:org.shirakumo.cari3s)
 
+(defun eformat (string &rest args)
+  (format *error-output* "~&~?~%" string args))
+
 (defun parse-all-integers (string &key (start 0) (end (length string)))
   (loop for offset = start then next
         for (int next) = (multiple-value-list
