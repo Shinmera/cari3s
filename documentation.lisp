@@ -75,6 +75,9 @@ See VALUE-GENERATOR")
 
 You may specify whether you're interested in swap and cache
 by using the :SWAP and :CACHE initargs respectively.
+When :CACHE is T, memory used by the cache is counted as
+occupied. When :SWAP is T, swap memory and usage are added
+to the total.
 
 This value-generator supplies the following three values:
   0. usage-percentage
