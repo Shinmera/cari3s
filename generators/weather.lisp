@@ -25,7 +25,7 @@
                                      :external-format-in :utf-8
                                      :want-stream T)))
     (unwind-protect
-         (let ((data (gethash "currently" (yason:parse stream))))
+         (let ((data (gethash "currently" (com.inuoe.jzon:parse stream))))
            (flet ((d (field) (gethash field data)))
              (let ((summary (d "summary"))
                    (temperature (round (d "temperature")))

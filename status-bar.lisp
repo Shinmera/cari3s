@@ -47,7 +47,7 @@
         append (gethash generator (blocks bar))))
 
 (defmethod produce-output ((bar status-bar) payload)
-  (yason:encode (map 'vector #'to-table payload) (output bar))
+  (com.inuoe.jzon:stringify (map 'vector #'to-table payload) :stream (output bar))
   (format (output bar) ",~%"))
 
 (defmacro with-input-ready ((stream) &body body)
@@ -61,7 +61,7 @@
 
 (defmethod process-inputs ((bar status-bar))
   (with-input-ready ((input bar))
-    (let* ((table (yason:parse (input bar)))
+    (let* ((table (com.inuoe.jzon:parse (input bar)))
            (event (from-table 'click table)))
       (process-event event bar))
     (when (click-pause bar)
@@ -78,7 +78,7 @@
                              (* (interval bar) INTERNAL-TIME-UNITS-PER-SECOND)))))
 
 (defun run-bar (bar &key (pause 1/30) (click-events-p NIL))
-  (yason:encode (to-table (make-instance 'header :send-click-events-p click-events-p)) (output bar))
+  (com.inuoe.jzon:stringify (to-table (make-instance 'header :send-click-events-p click-events-p)) :stream (output bar))
   (format (output bar) "~%[~%")
   (start bar)
   (unwind-protect

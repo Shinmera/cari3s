@@ -31,7 +31,7 @@
                (:file "generators/uptime")
                (:file "generators/weather")
                (:file "documentation"))
-  :depends-on (:yason
+  :depends-on (:com.inuoe.jzon
                :cffi
                :usocket
                :pango-markup

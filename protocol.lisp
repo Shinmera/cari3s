@@ -76,7 +76,7 @@
       (if (separator block)
           (when (numberp (separator block))
             (setf (gethash "separator_block_width" table) (separator block)))
-          (setf (gethash "separator" table) 'yason:false))
+          (setf (gethash "separator" table) NIL))
       (unless (eql :none (text-format block))
         (setf (gethash "markup" table) (string-downcase (text-format block)))))
     table))
