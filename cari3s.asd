@@ -1,14 +1,8 @@
-#|
- This file is a part of cari3s
- (c) 2018 Shirakumo http://tymoon.eu (shinmera@tymoon.eu)
- Author: Nicolas Hafner <shinmera@tymoon.eu>
-|#
-
 (asdf:defsystem cari3s
   :version "2.0.0"
   :license "zlib"
-  :author "Nicolas Hafner <shinmera@tymoon.eu>"
-  :maintainer "Nicolas Hafner <shinmera@tymoon.eu>"
+  :author "Yukari Hafner <shinmera@tymoon.eu>"
+  :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :description "A generator for the i3 status bar."
   :homepage "https://Shinmera.github.io/cari3s/"
   :bug-tracker "https://github.com/Shinmera/cari3s/issues"
