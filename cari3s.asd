@@ -4,9 +4,9 @@
   :author "Yukari Hafner <shinmera@tymoon.eu>"
   :maintainer "Yukari Hafner <shinmera@tymoon.eu>"
   :description "A generator for the i3 status bar."
-  :homepage "https://Shinmera.github.io/cari3s/"
-  :bug-tracker "https://github.com/Shinmera/cari3s/issues"
-  :source-control (:git "https://github.com/Shinmera/cari3s.git")
+  :homepage "https://shinmera.com/docs/cari3s/"
+  :bug-tracker "https://shinmera.com/project/cari3s/issues"
+  :source-control (:git "https://shinmera.com/project/cari3s.git")
   :serial T
   :components ((:file "package")
                (:file "toolkit")
